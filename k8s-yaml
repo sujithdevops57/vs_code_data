@@ -1,0 +1,145 @@
+apiVersion: v1
+kind: pod
+metadata: 
+  name: sujith-pod
+  labels: 
+    app: backend
+spec: 
+  containers: 
+  - name: c1
+    image: nginx
+    ports: 
+    - containerPort: 8080
+
+    ---------------------------------------
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: sujith-replica
+  labels:
+    app: backend 
+spec:
+  replicas: 3
+  selector: 
+    matchLabels: 
+      app: backend
+  template: #pod template
+    metadata: 
+      labels: 
+        app: backend
+    spec: 
+      containers: 
+      - name: c1
+        image: nginx
+        ports: 
+        - containerPort: 80 
+---------------------------------------------
+apiVesrion: apps/v1
+kind: ReplicaSet
+metadata: 
+  name: su-rs 
+  labels: 
+    app: replica-1
+spec: 
+  replicas: 3
+  selector:
+    matchLabels:
+    app: backend-rs1
+  template: 
+    metadata: 
+      labels: 
+        app: backend-rs1
+    spec: 
+      containers: 
+      - name: c2
+        image: apache
+        ports: 
+        - containerPort: 80    
+----------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: sujith-Deployment
+  labels: 
+  app: fs
+spec: 
+  replicas: 3
+  selector:
+    matchLabels: 
+    app: suji-pod
+  template: # template info
+    metadata:
+      labels: 
+        app: suji-pod
+    spec: 
+      containers: 
+      - name: c1
+        image: nginx
+        ports:
+          containerPort: 80    
+--------------------------------------------------------------------------
+#Rolling Update .yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: sujith-Deployment
+  labels: 
+    app: sd
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingupdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: pod-template-1    
+  template: 
+    metadata:
+      labels: 
+        app: pod-template-1
+    spec: 
+      containers:
+      - name: c56
+      image: nginx
+      ports: 
+        containerPorts: 80    
+------------------------------------------------------------
+#service.yaml
+
+apiVersion: v1
+kind: Service
+metadata: 
+  name: sujith-service
+spec: 
+  selector:
+    app: sujith-pod 
+  ports:
+  #container port
+  - targetPort: 80
+  # service port
+    port: 80
+    name: my-svc-port
+    protocol: TCP
+  type: NodePort 
+  ----------------------
+apiVersion: v1
+kind: Service
+metadata: 
+  name: clusterip-service
+spec:
+  selector:
+    app: python-app # must be given here pod info
+  ports: 
+  - targetPort: 8080
+    port: 80
+    name: svc-port
+    protocol: TCP
+  type: ClusterIP   
+  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+   
+
