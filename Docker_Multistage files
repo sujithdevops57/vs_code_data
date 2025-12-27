@@ -1,0 +1,106 @@
+
+        WORKING MULTI-STAGE FILE 
+
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
+WORKDIR /sujith
+RUN git clone https://github.com/spring-projects/spring-petclinic.git
+RUN cd /sujith/spring-petclinic && mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jdk 
+COPY --from=builder /sujith/spring-petclinic/target/*.jar /sujith/app.jar
+EXPOSE 8080
+CMD ["java", "-jar", "/sujith/app.jar"]        
+---------------------------------------------------------------------------
+    calculator : WORKING    
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
+WORKDIR /sujith
+RUN git clone https://github.com/NaveenReddyMatta/Calculator.git
+RUN cd /sujith/Calculator/calculator && mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jdk
+COPY --from=builder /sujith/Calculator/calculator/target/*.jar /sujith/suji.jar
+EXPOSE 8081
+CMD ["java", "-jar", "/sujith/suji.jar"]
+
+------------------------------------------------------------------------
+    single stage docker file spring-petclinic-[ WORKING ] 
+
+
+FROM eclipse-temurin:25-jdk
+RUN apt-get update && apt-get install -y git maven
+WORKDIR /ram
+RUN git clone https://github.com/spring-projects/spring-petclinic.git
+RUN mvn -f spring-petclinic/pom.xml clean package -DskipTests
+RUN ls -l /ram/spring-petclinic/target
+RUN cp /ram/spring-petclinic/target/*-SNAPSHOT.jar /ram/app.jar
+EXPOSE 8080
+CMD ["java", "-jar", "/ram/app.jar"] 
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+FROM ubuntu:22.04 
+
+RUN apt update -y &&\ 
+    apt install openjdk-21-jdk -y &&\
+    apt install maven -y
+ADD https://github.com/pavandath/spring-petclinic.git /spring
+WORKDIR /spring
+RUN mvn clean package 
+CMD [ "java", "-jar","target/spring-petclinic-3.3.0-SNAPSHOT.jar"] 
+
+ARG JAR_FILE=target/spring-petclinic-3.3.0-SNAPSHOT.jar
+
+COPY ${JAR_FILE} app.jar 
+
+
+
+
+
+
+
+#multistage
+FROM ubuntu:22.04 AS  builder
+RUN apt update -y && \
+    apt install openjdk-21-jdk -y && \
+    apt install maven -y
+ADD https://github.com/pavandath/spring-petclinic.git /spring
+WORKDIR /spring
+RUN mvn clean package
+
+FROM eclipse-temurin:21-jre-jammy
+WORKDIR /app
+COPY --from=builder /spring/target/spring-petclinic-3.3.0-SNAPSHOT.jar spring.jar
+EXPOSE 8080
+CMD [ "java", "-jar", "spring.jar" ] 
+
+
+FROM ubuntu:24.04
+RUN apt-get update -y
+RUN apt-get install -y iputils-ping
+CMD ["ping","google.com"]
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
+WORKDIR /sujith
+RUN git clone https://github.com/spring-projects/spring-petclinic.git
+RUN cd /sujith/spring-petclinic && mvn clean package -DskipTests
+
+FROM eclipse-temurin:21-jdk 
+COPY --from=builder /sujith/spring-petclinic/target/*.jar /sujith/app.jar
+EXPOSE 8080
+CMD ["java", "-jar", "/sujith/app.jar"]
+
+----------
+FROM openjdk:21
+WORKDIR /sujith
+COPY target/*.jar /sujith.jar
+EXPOSE 8081
+CMD ["java","-jar","*sujith.jar"]
+
+#####
+FROM openjdk:21
+WORKDIR /sujith
+COPY target/calculator-0.0.1-SNAPSHOT.jar   app.jar
+EXPOSE 8081
+ENTRYPOINT ["java","-jar","app.jar"]
+
