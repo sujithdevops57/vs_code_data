@@ -1,0 +1,150 @@
+# ping.yml
+- name: ping all the servers 
+  hosts: all
+  tasks:
+  - name: pinging all the servers
+    ping:
+    -----------------------
+- name: ping all the servers
+  hosts: all
+  tasks: 
+  - name: pinging all the above
+    ping: 
+
+    -------------------------------------------------------------------
+    creating a file in host vms ........
+---
+- name: creating a file 
+  hosts: all
+  tasks: 
+   - name: creting sujith.txt file now 
+     file:
+       path: /tmp/sujith.txt
+       mode: '0644'
+       owner: sujith
+       state: touch  
+
+
+   
+---
+- name: installing the webserver and starting it ...
+  become: true
+  hosts: all
+  tasks: 
+   - name: installing webserver
+     apt:
+       name: apache2
+       state: present
+   - name: starting the webserver
+     service: 
+       name: apache2
+       state: started  
+   - name: copy the files from local to repo
+     copy: 
+       src: index.html
+       des: /var/www/html 
+            
+
+---
+- name: installing webservers 
+  hosts: all
+  become: true
+  vars:
+    courseName: java-full-stack
+    batchNumber: J-38
+  tasks: 
+   - name: installing apache2 webserver
+     apt: 
+       name: apache2
+       state: present
+   - name: starting webserver
+     service: 
+       name: apache2
+       state: started
+   - name: copy the file 
+     template:
+       src: index.html
+       dest: /var/www/html/index.html
+
+       <h1>Hello sujith Welcome to {{courseName}} , from now u belongs to {{batchNumber}}</h1>       
+-----------------------------------------------------------------------------
+
+---
+- name: installing apache2 webserver
+  hosts: all
+  become: true
+  tasks: 
+   - name: installing webserver 
+     apt: 
+       name: apache2
+       state: present
+   - name: starting webserver
+     service:
+       name: apache2
+       state: started
+   - name : copy the files form local to remote 
+     copy: 
+       src: index.html
+       dest: /var/www/html/index.html
+
+       --------------------------------------------------------------
+
+       loops-concept :
+---
+- name: looping concept : installing multiple packages
+  hosts: all
+  tasks: 
+  apt: name: "{{item}}" state: present  
+  with_items:
+  - git
+  - apache2
+  - tree
+  - unzip
+
+  #apt: ['git', 'apache2','tree', 'unzip']  
+  ---------------------------------------------------------------------
+  ----------------------------------------------------------------------
+- name: creating tags and attaching the tags 
+  hosts: all
+  tasks:
+    - name: install nginx
+      apt:
+        name: nginx
+        state: present
+      tags:
+        - install
+    - name: start the nginx service 
+      service:
+        - name: nginx
+          state: started
+      tags: 
+        - start
+        - service
+      # to run the tags
+      # ansible-playbook playbook.yaml --tags "install"
+      # to run the multiple tags .
+      # ansible-playbook playbook.yaml --tags "start,service"     
+      # to skip the tags 
+      # ansible-playbook playbook.yaml --skip-tags "install"    
+      # to list all the tags
+      # ansible-playbook playbook.yaml --list-tags 
+----------------------------------------------------------------------------------------------------------------------------------------------------
+- name: Installing apache server
+  become: true 
+  hosts: all
+  tasks: 
+   - name: install apache2
+     apt:
+       name: apache2
+       state: present
+       update_cache: yes 
+
+       --------------------------------------------------------
+       ansible -b -i inv_file -m apt -a "name=apache2 state=present update_cache=yes"
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+  
+
+
+         
