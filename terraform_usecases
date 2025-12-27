@@ -522,5 +522,67 @@ output "vm_id_display"{
 }
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+provider "google" {
+    project = var.proj-id
+    region = "us-central1"
+    zone = "us-central1-c"
+}
+
+#project-id variable declaration 
+variable "proj-id" {
+    type = string
+    default = "big-elysium-466212-e2"
+}
+#service-acc id variable declaration
+ variable "seraccid" {
+   type = string 
+   default = "service57"
+ }
+
+
+#create a service account
+resource "google_service_account" "service_acc" {
+    account_id = var.seraccid
+    display_name = "service-acc56"
+}
+
+#create a null resource 
+
+resource "null_resource" "delay-seracc" {
+    provisioner "local-exec"{
+
+        command = "echo Simulating Iam delay.... && timeout /t 30 "
+    
+    }
+}
+
+#create a vm 
+resource "google_compute_instance" "vm_creation" {
+    name = "pla-vm"
+    machine_type = "e2-micro"
+    zone = "us-central1-b"
+  
+    boot_disk {
+       initialize_params {
+          image = "debian-cloud/debian-12"
+       }
+    }
+    network_interface {
+        network = "default"
+        access_config {}
+    }
+    service_account {
+        email = "${var.seraccid}@${var.proj-id}.iam.gserviceaccount.com"
+        scopes = ["cloud-platform"]
+    }
+
+   
+   
+} 
+ resource "null_resource" "script" {
+
+
+    depends_on = [ google_compute_instance.vm_creation ]
+ }
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
